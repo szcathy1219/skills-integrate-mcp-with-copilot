@@ -78,6 +78,155 @@ activities = {
 }
 
 
+# In-memory user database
+users = {
+    "michael@mergington.edu": {
+        "name": "Michael Johnson",
+        "grade": 10,
+        "groups": ["Chess Club"],
+        "mentor": None,
+        "responsibilities": ["Club President"],
+        "team": "Chess Team"
+    },
+    "daniel@mergington.edu": {
+        "name": "Daniel Smith",
+        "grade": 10,
+        "groups": ["Chess Club"],
+        "mentor": "michael@mergington.edu",
+        "responsibilities": [],
+        "team": "Chess Team"
+    },
+    "emma@mergington.edu": {
+        "name": "Emma Wilson",
+        "grade": 11,
+        "groups": ["Programming Class"],
+        "mentor": None,
+        "responsibilities": ["Class Leader"],
+        "team": "Programming Team"
+    },
+    "sophia@mergington.edu": {
+        "name": "Sophia Brown",
+        "grade": 11,
+        "groups": ["Programming Class"],
+        "mentor": "emma@mergington.edu",
+        "responsibilities": [],
+        "team": "Programming Team"
+    },
+    "john@mergington.edu": {
+        "name": "John Davis",
+        "grade": 9,
+        "groups": ["Gym Class"],
+        "mentor": None,
+        "responsibilities": [],
+        "team": "Gym Team"
+    },
+    "olivia@mergington.edu": {
+        "name": "Olivia Miller",
+        "grade": 9,
+        "groups": ["Gym Class"],
+        "mentor": "john@mergington.edu",
+        "responsibilities": [],
+        "team": "Gym Team"
+    },
+    "liam@mergington.edu": {
+        "name": "Liam Garcia",
+        "grade": 12,
+        "groups": ["Soccer Team"],
+        "mentor": None,
+        "responsibilities": ["Captain"],
+        "team": "Soccer Team"
+    },
+    "noah@mergington.edu": {
+        "name": "Noah Rodriguez",
+        "grade": 12,
+        "groups": ["Soccer Team"],
+        "mentor": "liam@mergington.edu",
+        "responsibilities": [],
+        "team": "Soccer Team"
+    },
+    "ava@mergington.edu": {
+        "name": "Ava Martinez",
+        "grade": 10,
+        "groups": ["Basketball Team"],
+        "mentor": None,
+        "responsibilities": [],
+        "team": "Basketball Team"
+    },
+    "mia@mergington.edu": {
+        "name": "Mia Anderson",
+        "grade": 10,
+        "groups": ["Basketball Team"],
+        "mentor": "ava@mergington.edu",
+        "responsibilities": [],
+        "team": "Basketball Team"
+    },
+    "amelia@mergington.edu": {
+        "name": "Amelia Taylor",
+        "grade": 11,
+        "groups": ["Art Club"],
+        "mentor": None,
+        "responsibilities": ["Club Organizer"],
+        "team": "Art Team"
+    },
+    "harper@mergington.edu": {
+        "name": "Harper Thomas",
+        "grade": 11,
+        "groups": ["Art Club"],
+        "mentor": "amelia@mergington.edu",
+        "responsibilities": [],
+        "team": "Art Team"
+    },
+    "ella@mergington.edu": {
+        "name": "Ella Jackson",
+        "grade": 9,
+        "groups": ["Drama Club"],
+        "mentor": None,
+        "responsibilities": [],
+        "team": "Drama Team"
+    },
+    "scarlett@mergington.edu": {
+        "name": "Scarlett White",
+        "grade": 9,
+        "groups": ["Drama Club"],
+        "mentor": "ella@mergington.edu",
+        "responsibilities": [],
+        "team": "Drama Team"
+    },
+    "james@mergington.edu": {
+        "name": "James Harris",
+        "grade": 12,
+        "groups": ["Math Club"],
+        "mentor": None,
+        "responsibilities": ["Math Tutor"],
+        "team": "Math Team"
+    },
+    "benjamin@mergington.edu": {
+        "name": "Benjamin Clark",
+        "grade": 12,
+        "groups": ["Math Club"],
+        "mentor": "james@mergington.edu",
+        "responsibilities": [],
+        "team": "Math Team"
+    },
+    "charlotte@mergington.edu": {
+        "name": "Charlotte Lewis",
+        "grade": 10,
+        "groups": ["Debate Team"],
+        "mentor": None,
+        "responsibilities": [],
+        "team": "Debate Team"
+    },
+    "henry@mergington.edu": {
+        "name": "Henry Walker",
+        "grade": 10,
+        "groups": ["Debate Team"],
+        "mentor": "charlotte@mergington.edu",
+        "responsibilities": [],
+        "team": "Debate Team"
+    }
+}
+
+
 @app.get("/")
 def root():
     return RedirectResponse(url="/static/index.html")
@@ -130,3 +279,33 @@ def unregister_from_activity(activity_name: str, email: str):
     # Remove student
     activity["participants"].remove(email)
     return {"message": f"Unregistered {email} from {activity_name}"}
+
+
+@app.get("/users")
+def get_users():
+    """Get all user profiles"""
+    return users
+
+
+@app.get("/users/{email}")
+def get_user(email: str):
+    """Get a specific user's profile"""
+    if email not in users:
+        raise HTTPException(status_code=404, detail="User not found")
+    return users[email]
+
+
+@app.post("/users")
+def create_user(email: str, name: str, grade: int):
+    """Create a new user profile"""
+    if email in users:
+        raise HTTPException(status_code=400, detail="User already exists")
+    users[email] = {
+        "name": name,
+        "grade": grade,
+        "groups": [],
+        "mentor": None,
+        "responsibilities": [],
+        "team": None
+    }
+    return {"message": f"User {email} created"}
